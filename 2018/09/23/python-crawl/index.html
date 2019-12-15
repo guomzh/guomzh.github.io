@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="爬虫,Python,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论有2种实现方案：1、使用pyspider开源框架，安装好pyspider并启动后，默认是本地的5001端口，新建一个爬虫项目，写下如下python代码实践爬去知乎的问题和评论数据，同时使用python-mysql，把爬到的数据存到自己建的一个数据库">
+<meta name="keywords" content="爬虫,Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用python爬虫——爬取淘宝图片和知乎内容">
+<meta property="og:url" content="https://guomzh.com/2018/09/23/python-crawl/index.html">
+<meta property="og:site_name" content="张国铭 - guomzh">
+<meta property="og:description" content="目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论有2种实现方案：1、使用pyspider开源框架，安装好pyspider并启动后，默认是本地的5001端口，新建一个爬虫项目，写下如下python代码实践爬去知乎的问题和评论数据，同时使用python-mysql，把爬到的数据存到自己建的一个数据库">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-23T03:34:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用python爬虫——爬取淘宝图片和知乎内容">
+<meta name="twitter:description" content="目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论有2种实现方案：1、使用pyspider开源框架，安装好pyspider并启动后，默认是本地的5001端口，新建一个爬虫项目，写下如下python代码实践爬去知乎的问题和评论数据，同时使用python-mysql，把爬到的数据存到自己建的一个数据库">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://guomzh.com/2018/09/23/python-crawl/">
+
+
+
+
+
+  <title>使用python爬虫——爬取淘宝图片和知乎内容 | 张国铭 - guomzh</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/guomzh"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/images/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张国铭 - guomzh</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">乐于分享~</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            Hire me!
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://guomzh.com/2018/09/23/python-crawl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张国铭">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张国铭 - guomzh">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用python爬虫——爬取淘宝图片和知乎内容</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-23T11:29:42+08:00">
+                2018-09-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>   阅读次数：
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论"><a href="#目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论" class="headerlink" title="目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论"></a>目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论</h2><p>有2种实现方案：<br>1、使用pyspider开源框架，安装好pyspider并启动后，默认是本地的5001端口，新建一个爬虫项目，写下如下python代码实践爬去知乎的问题和评论数据，同时使用python-mysql，把爬到的数据存到自己建的一个数据库，把数据留给自己使用分析哈哈！<br>2、使用urllib,PyQuery,requests,BeautifulSoup等库自己实现一个简单的爬虫,可以爬取图片下载下来，存到数据库，或者爬取文本</p>
+<hr>
+<p><strong>本文共4部分：</strong></p>
+<ul>
+<li>写一个最简单的爬虫</li>
+<li>爬取淘宝上的模特图片</li>
+<li>爬取知乎上的内容，并通过MySQLdb保存到自己建的数据库中</li>
+<li>爬取<a href="https://www.v2ex.com社区下的所有讨论话题" target="_blank" rel="noopener">https://www.v2ex.com社区下的所有讨论话题</a><h2 id="最简单的爬虫——如下python代码"><a href="#最简单的爬虫——如下python代码" class="headerlink" title="最简单的爬虫——如下python代码"></a>最简单的爬虫——如下python代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import re</span><br><span class="line">from bs4 import BeautifulSoup</span><br><span class="line">def most_simple_crawl():</span><br><span class="line">    # 最简单的爬虫</span><br><span class="line">    content = requests.get(&apos;http://www.qiushibaike.com&apos;).content</span><br><span class="line">    soup = BeautifulSoup(content, &apos;html.parser&apos;)</span><br><span class="line">    for div in soup.find_all(&apos;div&apos;, &#123;&apos;class&apos;: &apos;content&apos;&#125;):</span><br><span class="line">        print div.text.strip()</span><br><span class="line">        </span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">        most_simple_crawl()</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="爬取淘宝上模特图片"><a href="#爬取淘宝上模特图片" class="headerlink" title="爬取淘宝上模特图片"></a>爬取淘宝上模特图片</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># coding=utf-8</span><br><span class="line">import re</span><br><span class="line">import urllib2</span><br><span class="line">import urllib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def crawl_taobao():</span><br><span class="line">    # 淘宝上搜索的关键词</span><br><span class="line">    key = &quot;比基尼&quot;</span><br><span class="line">    key = urllib2.quote(key)</span><br><span class="line">    headers = (&quot;User-Agent&quot;, &quot;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0&quot;)</span><br><span class="line">    opener = urllib2.build_opener()</span><br><span class="line">    opener.addheaders = [headers]</span><br><span class="line">    urllib2.install_opener(opener)</span><br><span class="line">    # 分页爬取</span><br><span class="line">    for i in range(0, 4):</span><br><span class="line">        url = &quot;https://s.taobao.com/search?q=&quot; + key</span><br><span class="line">        data = urllib2.urlopen(url).read().decode(&quot;utf-8&quot;, &quot;ignore&quot;)</span><br><span class="line">        pat = &apos;pic_url&quot;:&quot;//(.*?)&quot;&apos;</span><br><span class="line">        imagelist = re.compile(pat).findall(data)</span><br><span class="line">        # 爬取每一页中所有的图片</span><br><span class="line">        for j in range(0, len(imagelist)):</span><br><span class="line">            thisimg = imagelist[j]</span><br><span class="line">            thisimgurl = &quot;http://&quot; + thisimg</span><br><span class="line">            # 保存到自己电脑的D盘</span><br><span class="line">            savefile = &apos;D:/pic/&apos; + str(i) + str(j) + &apos;.jpg&apos;</span><br><span class="line">            urllib.urlretrieve(thisimgurl, filename=savefile)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    crawl_taobao()</span><br></pre></td></tr></table></figure>
+<h2 id="爬取知乎的数据，需伪装成GoogleBot去爬，否则ip会被封掉，并通过MySQLdb保存到自己建的数据库中"><a href="#爬取知乎的数据，需伪装成GoogleBot去爬，否则ip会被封掉，并通过MySQLdb保存到自己建的数据库中" class="headerlink" title="爬取知乎的数据，需伪装成GoogleBot去爬，否则ip会被封掉，并通过MySQLdb保存到自己建的数据库中"></a>爬取知乎的数据，需伪装成GoogleBot去爬，否则ip会被封掉，并通过MySQLdb保存到自己建的数据库中</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">from pyspider.libs.base_handler import *</span><br><span class="line">import MySQLdb</span><br><span class="line">import random</span><br><span class="line"></span><br><span class="line">class Handler(BaseHandler):</span><br><span class="line">    crawl_config = &#123;</span><br><span class="line">        &apos;headers&apos;:&#123;</span><br><span class="line">          &apos;User-Agent&apos;:&apos;GoogleBot&apos;,</span><br><span class="line">          &apos;Host&apos;:&apos;www.zhihu.com&apos;,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    def __init__(self):</span><br><span class="line">         self.db = MySQLdb.connect(&apos;localhost&apos;, &apos;root&apos;, &apos;123456&apos;, &apos;onlineq&apos;, charset=&apos;utf8&apos;)</span><br><span class="line">    # 把爬到的知乎问题存到自己建的数据库中</span><br><span class="line">    def add_question(self,title,content,comment_count):</span><br><span class="line">        try:</span><br><span class="line">            cursor=self.db.cursor()</span><br><span class="line">            sql = &apos;insert into question(title, content, user_id, created_date,comment_count)values (&quot;%s&quot;,&quot;%s&quot;, %d,now(),%d)&apos;%(title,content,random.randint(20,26),comment_count)</span><br><span class="line">            print sql</span><br><span class="line">            cursor.execute(sql)</span><br><span class="line">            qid= cursor.lastrowid</span><br><span class="line">            print qid</span><br><span class="line">            self.db.commit()</span><br><span class="line">            return qid</span><br><span class="line">        except Exception, e:</span><br><span class="line">            self.db.rollback()</span><br><span class="line">        return 0</span><br><span class="line">    # 把爬到的问题评论存到自己建的数据库中</span><br><span class="line">    def add_comment(self,qid, comment):</span><br><span class="line">        try:</span><br><span class="line">            cursor=self.db.cursor()</span><br><span class="line">            sql=&apos;insert into comment (content, entity_type, entity_id, user_id, created_date) values(&quot;%s&quot;,100,%d,%d ,now())&apos; % (comment, qid,random.randint(20,26))</span><br><span class="line">            print sql</span><br><span class="line">            cursor.execute(sql)</span><br><span class="line">            self.db.commit()</span><br><span class="line">        except Exception, e:</span><br><span class="line">            print e</span><br><span class="line">            self.db.rollback()</span><br><span class="line">        </span><br><span class="line">    @every(minutes=24 * 60)</span><br><span class="line">    def on_start(self):</span><br><span class="line">        self.crawl(&apos;https://www.zhihu.com/topic/19552330/top-answers&apos;, callback=self.index_page,validate_cert=False)</span><br><span class="line">    </span><br><span class="line">        </span><br><span class="line">    @config(age=10 * 24 * 60 * 60)</span><br><span class="line">    def index_page(self, response):</span><br><span class="line">        for each in response.doc(&apos;a[data-za-detail-view-element_name=&quot;Title&quot;]&apos;).items():</span><br><span class="line">            self.crawl(each.attr.href, callback=self.detail_page,validate_cert=False)</span><br><span class="line"></span><br><span class="line">    @config(priority=2)</span><br><span class="line">    def detail_page(self, response):</span><br><span class="line">        title = response.doc(&apos;h1.QuestionHeader-title&apos;).text()</span><br><span class="line">        content = response.doc(&apos;span.RichText.ztext&apos;).html()</span><br><span class="line">        items = response.doc(&apos;span.RichText.ztext.CopyrightRichText-richText&apos;).items()</span><br><span class="line">        if content==None:</span><br><span class="line">            content = &apos;&apos;</span><br><span class="line">        content = content.replace(&apos;&quot;&apos;,&apos;\\&quot;&apos;)</span><br><span class="line">        qid=self.add_question(title,content,sum(1 for x in items))</span><br><span class="line">        for each in response.doc(&apos;span.RichText.ztext.CopyrightRichText-richText&apos;).items():</span><br><span class="line">            self.add_comment(qid,each.html().replace(&apos;&quot;&apos;,&apos;\\&quot;&apos;))</span><br><span class="line">        return &#123;</span><br><span class="line">            &quot;url&quot;: response.url,</span><br><span class="line">            &quot;title&quot;: response.doc(&apos;title&apos;).text(),</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="爬取https-www-v2ex-com社区下的所有讨论话题"><a href="#爬取https-www-v2ex-com社区下的所有讨论话题" class="headerlink" title="爬取https://www.v2ex.com社区下的所有讨论话题"></a>爬取<a href="https://www.v2ex.com社区下的所有讨论话题" target="_blank" rel="noopener">https://www.v2ex.com社区下的所有讨论话题</a></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">from pyspider.libs.base_handler import *</span><br><span class="line">import random</span><br><span class="line">import MySQLdb</span><br><span class="line"></span><br><span class="line">class Handler(BaseHandler):</span><br><span class="line">    crawl_config = &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">         self.db = MySQLdb.connect(&apos;localhost&apos;, &apos;root&apos;, &apos;123456&apos;, &apos;onlineq&apos;, charset=&apos;utf8&apos;)</span><br><span class="line">    </span><br><span class="line">    def add_question(self,title,content):</span><br><span class="line">        try:</span><br><span class="line">            cursor=self.db.cursor()</span><br><span class="line">            sql = &apos;insert into question(title, content, user_id, created_date,comment_count)values (&quot;%s&quot;,&quot;%s&quot;, %d,now(),0)&apos;%(title,content,random.randint(20,22))</span><br><span class="line">            print sql</span><br><span class="line">            cursor.execute(sql)</span><br><span class="line">            print cursor.lastrowid</span><br><span class="line">            self.db.commit()</span><br><span class="line">        except Exception, e:</span><br><span class="line">            self.db.rollback()</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    @every(minutes=24 * 60)</span><br><span class="line">    def on_start(self):</span><br><span class="line">        self.crawl(&apos;https://www.v2ex.com/&apos;, callback=self.index_page,validate_cert=False)</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    @config(age=10 * 24 * 60 * 60)</span><br><span class="line">    def index_page(self, response):</span><br><span class="line">        for each in response.doc(&apos;a[href^=&quot;https://www.v2ex.com/?tab=&quot;]&apos;).items():</span><br><span class="line">            self.crawl(each.attr.href, callback=self.tab_page,validate_cert=False)</span><br><span class="line">            </span><br><span class="line"></span><br><span class="line">    @config(priority=2)</span><br><span class="line">    def tab_page(self, response):</span><br><span class="line">        for each in response.doc(&apos;a[href^=&quot;https://www.v2ex.com/go/&quot;]&apos;).items():</span><br><span class="line">            self.crawl(each.attr.href, callback=self.board_page,validate_cert=False)</span><br><span class="line">            </span><br><span class="line"></span><br><span class="line">    @config(priority=2)</span><br><span class="line">    def board_page(self, response):</span><br><span class="line">        for each in response.doc(&apos;a[href^=&quot;https://www.v2ex.com/t/&quot;]&apos;).items():</span><br><span class="line">            url=each.attr.href</span><br><span class="line">            if url.find(&apos;#reply&apos;)&gt;0:</span><br><span class="line">                url=url[0:url.find(&apos;#&apos;)]</span><br><span class="line">            self.crawl(url, callback=self.detail_page,validate_cert=False)</span><br><span class="line">        for each in response.doc(&apos;a.page_normal&apos;).items():</span><br><span class="line">            self.crawl(each.attr.href, callback=self.board_page,validate_cert=False)</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">    @config(priority=2)</span><br><span class="line">    def detail_page(self, response):</span><br><span class="line">        title = response.doc(&apos;h1&apos;).text()</span><br><span class="line">        content = response.doc(&apos;div.topic_content&apos;).html().replace(&apos;&quot;&apos;,&apos;\\&quot;&apos;)</span><br><span class="line">        self.add_question(title,content)</span><br><span class="line">        return &#123;</span><br><span class="line">            &quot;url&quot;: response.url,</span><br><span class="line">            &quot;title&quot;: response.doc(&apos;title&apos;).text(),</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/爬虫/" rel="tag"><i class="fa fa-tag"></i> 爬虫</a>
+          
+            <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/08/online-questioning/" rel="next" title="online-questioning">
+                <i class="fa fa-chevron-left"></i> online-questioning
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/15/hello-world/" rel="prev" title="Hello 我的第一篇文章">
+                Hello 我的第一篇文章 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张国铭</p>
+              <p class="site-description motion-element" itemprop="description">https://blog.csdn.net/qq_37372007</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论"><span class="nav-number">1.</span> <span class="nav-text">目标：使用python爬取淘宝图片；使用python的一个开源框架pyspider（非常好用，一个国人写的）爬取知乎上的每个问题，及这个问题下的所有评论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最简单的爬虫——如下python代码"><span class="nav-number">2.</span> <span class="nav-text">最简单的爬虫——如下python代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#爬取淘宝上模特图片"><span class="nav-number">3.</span> <span class="nav-text">爬取淘宝上模特图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#爬取知乎的数据，需伪装成GoogleBot去爬，否则ip会被封掉，并通过MySQLdb保存到自己建的数据库中"><span class="nav-number">4.</span> <span class="nav-text">爬取知乎的数据，需伪装成GoogleBot去爬，否则ip会被封掉，并通过MySQLdb保存到自己建的数据库中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#爬取https-www-v2ex-com社区下的所有讨论话题"><span class="nav-number">5.</span> <span class="nav-text">爬取https://www.v2ex.com社区下的所有讨论话题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张国铭</span>
+
+  
+</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>  访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+
+</body>
+</html>
