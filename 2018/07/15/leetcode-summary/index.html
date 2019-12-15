@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="leetcode上写过的算法代码总结 ——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。     43.字符串相乘给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。   思路：大数相乘，用一个int数组存每一位的相乘数，像小学时学的乘法运算那样算 12345678910111">
+<meta name="description" content="leetcode上写过的算法代码总结 ——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。">
 <meta name="keywords" content="leetcode,算法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="leetcode-summary">
 <meta property="og:url" content="https://guomzh.com/2018/07/15/leetcode-summary/index.html">
 <meta property="og:site_name" content="张国铭 - guomzh">
-<meta property="og:description" content="leetcode上写过的算法代码总结 ——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。     43.字符串相乘给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。   思路：大数相乘，用一个int数组存每一位的相乘数，像小学时学的乘法运算那样算 12345678910111">
+<meta property="og:description" content="leetcode上写过的算法代码总结 ——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-14T03:35:34.000Z">
+<meta property="og:updated_time" content="2019-12-15T09:34:43.421Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="leetcode-summary">
-<meta name="twitter:description" content="leetcode上写过的算法代码总结 ——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。     43.字符串相乘给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。   思路：大数相乘，用一个int数组存每一位的相乘数，像小学时学的乘法运算那样算 12345678910111">
+<meta name="twitter:description" content="leetcode上写过的算法代码总结 ——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。">
 
 
 
@@ -361,6 +361,7 @@
 <p>——写在前面，复习算法一段时间了,在此记录一下自己写过的算法代码，算是做个总结，供自己以后回顾。  </p>
 </blockquote>
 <hr>
+<a id="more"></a>
 <h2 id="43-字符串相乘"><a href="#43-字符串相乘" class="headerlink" title="43.字符串相乘"></a>43.字符串相乘</h2><p>给定两个以字符串形式表示的非负整数 <code>num1</code> 和 <code>num2</code>，返回 <code>num1</code> 和 <code>num2</code> 的乘积，它们的乘积也表示为字符串形式。  </p>
 <p>思路：大数相乘，用一个int数组存每一位的相乘数，像小学时学的乘法运算那样算</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">    public String multiply(String num1, String num2) &#123;</span><br><span class="line">        if(num1.equals(&quot;0&quot;)||num2.equals(&quot;0&quot;))</span><br><span class="line">            return &quot;0&quot;;</span><br><span class="line">        int len1 = num1.length();</span><br><span class="line">        int len2=num2.length();</span><br><span class="line">        int res_len=len1+len2;</span><br><span class="line">        int res[]=new int [res_len];</span><br><span class="line">        for(int i=len1-1;i&gt;=0;i--)&#123;</span><br><span class="line">            int n1=num1.charAt(i)-48;</span><br><span class="line">            int tmp=0;</span><br><span class="line">            for(int j=len2-1;j&gt;=0;j--)&#123;</span><br><span class="line">                int n2=num2.charAt(j)-48;</span><br><span class="line">                res[i+j+1]=n1*n2+res[i+j+1]+tmp;</span><br><span class="line">                tmp =res[i+j+1]/10;</span><br><span class="line">                res[i+j+1]=res[i+j+1]%10;</span><br><span class="line">            &#125;</span><br><span class="line">            res[i]+=tmp;</span><br><span class="line">        &#125;</span><br><span class="line">        StringBuilder sb=new StringBuilder();</span><br><span class="line">        int flag=1;</span><br><span class="line">        for(int i=0;i&lt;res_len;i++)&#123;</span><br><span class="line">            if(res[i]==0&amp;&amp;flag==1)</span><br><span class="line">                continue;</span><br><span class="line">            sb.append(res[i]);</span><br><span class="line">            flag=0;</span><br><span class="line">        &#125;</span><br><span class="line">        return sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -996,6 +997,7 @@ public List&lt;List&lt;Integer&gt;&gt; permute(int[] nums) {
         }
     }
 }
+
 
 
 

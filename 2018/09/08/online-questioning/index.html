@@ -88,7 +88,7 @@
 <meta property="og:description" content="online-questioning 在线问答平台, 这是我模仿知乎做的一个问答交流平台，类似贴吧那种，具有的功能：能发帖，回复，评论，站内私信，邮件服务等使用到的技术栈：1、spring/springboot    intercepter拦截器实现登录权限控制  javax.mali邮件服务，如有新评论时发邮件通知用户，注册时邮件验证  ioc项目容器中对象管理，对容器中beans操作  aop">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://guomzh.com/2018/09/08/online-questioning/guideimgs/异步队列实现.jpg">
-<meta property="og:updated_time" content="2018-09-30T13:19:36.000Z">
+<meta property="og:updated_time" content="2019-12-15T09:37:12.350Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="online-questioning">
 <meta name="twitter:description" content="online-questioning 在线问答平台, 这是我模仿知乎做的一个问答交流平台，类似贴吧那种，具有的功能：能发帖，回复，评论，站内私信，邮件服务等使用到的技术栈：1、spring/springboot    intercepter拦截器实现登录权限控制  javax.mali邮件服务，如有新评论时发邮件通知用户，注册时邮件验证  ioc项目容器中对象管理，对容器中beans操作  aop">
@@ -368,6 +368,7 @@
 <li>maven管理整个项目依赖<br>2、mybatis操作数据库主要业务数据<br>3、前端模板引擎freemarker ，渲染整个前端模板<br>4、算法设计：trie前缀树实现网站敏感词过滤<br>5、Redis实现异步队列，利用多线程实现异步事件处理，主要针对一些耗时操作，进行异步执行，如发邮件，评论后发站内私信通知等<br>6、使用 Redis 数据结构中的 set 集合实现用户对问题评论的点赞点踩功能<br>7、solr导入mysql数据，建立问题和标题文档库，利用ik-analyzer进行中文分词，用户可以进行站内全文搜索  </li>
 </ul>
 <p>开发通用的新模块流程：<br>1、数据库设计<br>2、Model：模型定义，与数据库相匹配<br>3、Dao层：数据操作<br>4、Service:服务包装<br>5、Controller：业务入口，数据交互<br>6、单元测试  </p>
+<a id="more"></a>
 <h2 id="注册模块："><a href="#注册模块：" class="headerlink" title="注册模块："></a>注册模块：</h2><ol>
 <li>用户名合法性检测（长度，敏感词，重复，特殊字符）  </li>
 <li>密码长度要求  </li>
